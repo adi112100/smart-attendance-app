@@ -1,3 +1,3 @@
-# Smart Attendance App
+#Smart Attendance App
 
-## This is a face recognition based attendance system.
+##This is a face recognition based attendance system.
