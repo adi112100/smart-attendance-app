@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<script type="text/javascript">
+		class Webcam {
+		    constructor(e, t = "user", s = null, i = null) {
+		        this._webcamElement = e, 
+		        this._webcamElement.width = this._webcamElement.width || 640, 
+		        this._webcamElement.height = this._webcamElement.height || .75 * this._webcamElement.width, 
+		        this._facingMode = t, 
+		        this._webcamList = [], 
+		        this._streamList = [], 
+		        this._selectedDeviceId = "", 
+		        this._canvasElement = s, 
+		        this._snapSoundElement = i
+		    }
+		    get facingMode() {
+		        return this._facingMode
+		    }
+		    set facingMode(e) {
+		        this._facingMode = e
+		    }
+		    get webcamList() {
+		        return this._webcamList
+		    }
+		    get webcamCount() {
+		        return this._webcamList.length
+		    }
+		    get selectedDeviceId() {
+		        return this._selectedDeviceId
+		    }
+		    getVideoInputs(e) {
+		        return this._webcamList = [], e.forEach(e => {
+		            "videoinput" === e.kind && this._webcamList.push(e)
+		        }), 1 == this._webcamList.length && (this._facingMode = "user"), this._webcamList
+		    }
+		    getMediaConstraints() {
+		        var e = {};
+		        return "" == this._selectedDeviceId ? e.facingMode = this._facingMode : e.deviceId = {
+		            exact: this._selectedDeviceId
+		        }, {
+		            video: e,
+		            audio: !1
+		        }
+		    }
+		    selectCamera() {
+		        for (let e of this._webcamList)
+		            if ("user" == this._facingMode && e.label.toLowerCase().includes("front") || "enviroment" == this._facingMode && e.label.toLowerCase().includes("back")) {
+		                this._selectedDeviceId = e.deviceId;
+		                break
+		            }
+		    }
+		    flip() {
+		        this._facingMode = "user" == this._facingMode ? "enviroment" : "user", this._webcamElement.style.transform = "", this.selectCamera()
+		    }
+		    async start(e = !0) {
+		        return new Promise((t, s) => {
+		            this.stop(), navigator.mediaDevices.getUserMedia(this.getMediaConstraints()).then(i => {
+		                this._streamList.push(i), this.info().then(i => {
+		                    this.selectCamera(), e ? this.stream().then(e => {
+		                        t(this._facingMode)
+		                    }).catch(e => {
+		                        s(e)
+		                    }) : t(this._selectedDeviceId)
+		                }).catch(e => {
+		                    s(e)
+		                })
+		            }).catch(e => {
+		                s(e)
+		            })
+		        })
+		    }
+		    async info() {
+		        return new Promise((e, t) => {
+		            navigator.mediaDevices.enumerateDevices().then(t => {
+		                this.getVideoInputs(t), e(this._webcamList)
+		            }).catch(e => {
+		                t(e)
+		            })
+		        })
+		    }
+		    async stream() {
+		        return new Promise((e, t) => {
+		            navigator.mediaDevices.getUserMedia(this.getMediaConstraints()).then(t => {
+		                this._streamList.push(t), this._webcamElement.srcObject = t, "user" == this._facingMode && (this._webcamElement.style.transform = "scale(-1,1)"), this._webcamElement.play(), e(this._facingMode)
+		            }).catch(e => {
+		                console.log(e), t(e)
+		            })
+		        })
+		    }
+		    stop() {
+		        this._streamList.forEach(e => {
+		            e.getTracks().forEach(e => {
+		                e.stop()
+		            })
+		        })
+		    }
+		    snap() {
+		        if (null != this._canvasElement) {
+		            null != this._snapSoundElement && this._snapSoundElement.play(), this._canvasElement.height = this._webcamElement.scrollHeight, this._canvasElement.width = this._webcamElement.scrollWidth;
+		            let e = this._canvasElement.getContext("2d");
+		            return "user" == this._facingMode && (e.translate(this._canvasElement.width, 0), e.scale(-1, 1)), e.clearRect(0, 0, this._canvasElement.width, this._canvasElement.height), e.drawImage(this._webcamElement, 0, 0, this._canvasElement.width, this._canvasElement.height), this._canvasElement.toDataURL("image/jpg")
+		        }
+		        throw "canvas element is missing"
+		    }
+		}
+	</script>
+
+	<title>Webcam Access</title>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <style>
+	    .card1 {
+	        border-radius: 50%;
+	        width: 18rem;
+	        height: 18rem;
+	        margin: 10px 0px 10px 0px;
+	        padding: 30px;
+	        /* background-image: linear-gradient(to bottom, #59D3BB , rgb(255, 255, 255)); */
+	        border: none;
+	    }
+
+	    .card2 {
+	        border-radius: 50%;
+	        width: 18rem;
+	        height: 18rem;
+	        object-fit: cover;
+	        padding: 50px;
+	        /* background-image: linear-gradient(to bottom, #59D3BB , rgb(255, 255, 255)); */
+	        border: none;
+	        pointer-events: none;
+	    }
+
+	    button {
+			border: none;
+			color: black;
+			padding: 8px 25px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 25px;
+			margin: 4px 2px;
+			transition-duration: 0.4s;
+			cursor: pointer;
+		}
+
+		button:hover {
+			background-color: #4CAF50;
+			color: white;
+		}
+
+	</style>
+
+</head>
+
+<body style="background-color: rgb(220, 220, 220);">
+
+    <div class="jumbotron jumbotron-fluid" style="background-color: rgb(39, 39, 39); color: white;">
+        <div class="container">
+            <h1 class="display-4">Smart Attendance System</h1>
+            <p class="lead">This is a smart attendance system which detects faces and marks their attendance using Deep
+                Learning.</p>
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+
+		<video id="webcam" autoplay playsinline width="640" height="480"></video>
+		<canvas id="canvas" class="d-none"></canvas>
+		<br>
+		<button onclick="clickPic()">Click</button>
+		<br>
+		<img id="snap" src="" />
+
+	</div>
+
+	<script type="text/javascript">
+		const webcamElement = document.getElementById('webcam');
+		const canvasElement = document.getElementById('canvas');
+		const snapSoundElement = document.getElementById('snapSound');
+		const webcam = new Webcam(webcamElement, 'user', canvasElement, snapSoundElement);
+
+		webcam.start()
+		   .then(result =>{
+		      console.log("webcam started");
+		   })
+		   .catch(err => {
+		       console.log(err);
+		   });
+
+		function clickPic()   
+		{
+			let picture = webcam.snap();
+			document.getElementById('snap').src = picture;
+			// webcam.stop();
+			saveBase64AsFile(picture, "abc.jpg")
+			// console.log(picture);
+			// document.querySelector('#download-photo').href = picture;
+		}
+
+		function saveBase64AsFile(base64, fileName) {
+			var link = document.createElement("a");
+			document.body.appendChild(link); 
+			link.setAttribute("href", base64);
+			link.setAttribute("download", fileName);
+			link.click();
+		}
+
+	</script>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
