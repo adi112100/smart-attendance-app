@@ -15,7 +15,30 @@
           <h1 class="display-4">Welcome {{user.username}}</h1>
           <p class="lead">You are the part of {{user.orgname}} organization!! , and this is your dashboard and you can view your attendance here.</p>
         </div>
+    </div>
+    <div class="alert alert-info" role="alert">
+       <h5>This Month Attendance - {{tmpresent}} / {{tmonth}} </h5>
+       <h5>Total Attendance - {{tpresent}} / {{total}} </h5>
       </div>
+    <div class="container">
+        {% for user in users %}
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card shadow">
+                    <div class="card-body">
+                      <span style="font-size: larger;">date - {{user.date.date}}</span>
+                      <span style="margin-left: 30px;"> status- 
+                          {% if user.status is True %}
+                          <span style="color: rgb(0, 192, 0); font-size: x-large;"> Present</span>
+                          {% else %}
+                          <span style="color: rgb(235, 0, 0); font-size: x-large;">Absent</span>
+                          {% endif %}</span>
+                    </div>
+                  </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
         crossorigin="anonymous"></script>

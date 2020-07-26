@@ -29,6 +29,7 @@ urlpatterns = [
     path('orgdashboard/', views.orgdashboard, name="orgdashboard"),
     path('userdashboard/', views.userdashboard, name="userdashboard"),
     path('orgdashboard/viewall/', views.viewall, name="viewall"),
+    path('orgdashboard/attendance/', views.attendance, name="attendance"),
     
     
 ]

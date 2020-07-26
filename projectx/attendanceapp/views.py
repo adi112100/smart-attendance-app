@@ -1,16 +1,19 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.models import User 
 from django import forms
-from  attendanceapp.models import Org, Indlist
-from .forms import UserForm
+from  attendanceapp.models import Org, Indlist, Orgattendance, Userattendance
+from datetime import datetime
 import numpy as np
 import cv2
 import json
 import face_recognition
 from PIL import Image
+import base64
+from io import BytesIO
 
 # Create your views here.
 
@@ -77,7 +80,21 @@ def orgdashboard(request):
 
 def userdashboard(request):
     user = Indlist.objects.filter(username=request.user.username).first()
-    return render(request, 'userdashboard.html', {'user':user})
+    users = Userattendance.objects.filter(username = request.user.username)
+    tpresent= 0
+    tmonth = 0
+    tmpresent = 0
+    for user in users:
+        if user.date.month == datetime.now().month and user.date.year == datetime.now().year:
+            tmonth+=1
+            if user.status:
+                tmpresent += 1
+        if user.status:
+            tpresent += 1
+    
+    # monthuser =  Userattendance.objects.filter(username = request.user.username)
+   
+    return render(request, 'userdashboard.html', {'user': user, 'users' : users, 'total' : len(users), 'tpresent' : tpresent, 'tmonth' : tmonth, 'tmpresent' : tmpresent})
 
 def viewall(request):
 
@@ -92,6 +109,64 @@ def viewall(request):
     else:
         messages.warning(request, "Login to org account first")
         return redirect('orglogin/')
+
+
+def attendance(request):
+    if request.is_ajax():
+        url = request.POST['url']
+        offset = url.index(',')+1
+        img_bytes = base64.b64decode(url[offset:])
+        img = Image.open(BytesIO(img_bytes))
+        # image=face_recognition.load_image_file(img)
+        # image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+        img  = np.array(img)
+        try:
+            faceLoc = face_recognition.face_locations(img)[0]
+            encodeimage = face_recognition.face_encodings(img)[0]
+        except:
+            return JsonResponse({'message': 'success', 'url' : url, 'username':'None'})
+        # users = Indlist.objects.filter(orgname=request.user.username)
+        users = Userattendance.objects.filter(orgname=request.user.username).filter(status=False).filter(date = datetime.now().date())
+        print(len(users))
+        if len(users)==0:
+            return JsonResponse({'message': 'ALL ARE PRESENT TODAY!! YOU MAY STOP THIS PORTAL'})
+
+        username = []
+        for user in users:
+            encoded = json.loads( user.encoded )
+            encoded = np.array(encoded)
+
+            results = face_recognition.compare_faces([encoded], encodeimage)
+            if results:
+                username.append(user.username)
+                user.status = True
+                user.save()
+                break
+                
+        if len(username) == 0:
+            username.append('None')
+        users = Userattendance.objects.filter(orgname=request.user.username).filter(date = datetime.now().date())
+        lstp=[]
+        lsta=[]
+        for user in users:
+            if user.status:
+                lstp.append(user.username)
+            else:
+                lsta.append(user.username)
+
+
+        return JsonResponse({'message': 'success', 'url' : url, 'username':username, 'lstp': lstp, 'lsta': lsta})
+        
+    orglastlogin = Orgattendance.objects.filter(orgname=request.user.username).filter(date= datetime.now().date())
+    if len(orglastlogin)==0:
+        users = Indlist.objects.filter(orgname=request.user.username)
+        for user in users:
+            userattendance = Userattendance( username=user.username, orgname= user.orgname, date = datetime.now().date(), encoded = user.encoded)
+            userattendance.save()
+        
+        orgattendance = Orgattendance( orgname = request.user.username, date = datetime.now().date() )
+        orgattendance.save()
+    return render(request, 'attendance.html')
 
 
 def register(request):
