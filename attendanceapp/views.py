@@ -124,12 +124,29 @@ def attendance(request):
             faceLoc = face_recognition.face_locations(img)[0]
             encodeimage = face_recognition.face_encodings(img)[0]
         except:
-            return JsonResponse({'message': 'success', 'url' : url, 'username':'None'})
+            users = Userattendance.objects.filter(orgname=request.user.username).filter(date = datetime.now().date())
+            lstp=[]
+            lsta=[]
+            for user in users:
+                if user.status:
+                    lstp.append(user.username)
+                else:
+                    lsta.append(user.username)
+            return JsonResponse({'message': 'success', 'url' : url, 'username':'None', 'lstp': lstp, 'lsta': lsta})
         # users = Indlist.objects.filter(orgname=request.user.username)
         users = Userattendance.objects.filter(orgname=request.user.username).filter(status=False).filter(date = datetime.now().date())
-        print(len(users))
+        # print(len(users))
         if len(users)==0:
-            return JsonResponse({'message': 'ALL ARE PRESENT TODAY!! YOU MAY STOP THIS PORTAL'})
+            users = Userattendance.objects.filter(orgname=request.user.username).filter(date = datetime.now().date())
+            lstp=[]
+            lsta=[]
+            for user in users:
+                if user.status:
+                    lstp.append(user.username)
+                else:
+                    lsta.append(user.username)
+            
+            return JsonResponse({'message': 'ALL ARE PRESENT TODAY!! YOU MAY STOP THIS PORTAL', 'lstp': lstp, 'lsta': lsta})
 
         username = []
         for user in users:

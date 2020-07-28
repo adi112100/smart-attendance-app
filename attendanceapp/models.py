@@ -32,6 +32,7 @@ class Userattendance(models.Model):
     status =models.BooleanField(default=False)
     date = models.DateTimeField(default = datetime.today)
     encoded = models.TextField(default='')
+    imagee = models.ImageField(blank=True) 
 
     def __str__(self):
         return self.username

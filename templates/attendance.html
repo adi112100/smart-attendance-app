@@ -18,21 +18,9 @@
 
 <body>
     {% csrf_token %}
-    <div class="container shadow">
-        <div class="row" align="center"><br></div>
+    <div class="container-fluid shadow">
         <div class="row" align="center">
-            <div class="col-xl-12">
-                <div id="my_camera"></div>
-                <form method="post" id="form">
-                    {% csrf_token %}
-                    <input type="text" class="form-control" id="image" name="url" aria-describedby="emailHelp"
-                        style="display: none;">
-                    <button type="submit" id="submitt" style="display: none;"></button>
-                </form>
-            </div>
-        </div>
-        <div class="row" align="center">
-           
+
             <div class="col-xl-12">
                 <div style="margin: 10px; padding: 10px; font-size: larger;">
                     <span style="font-size: larger;">
@@ -48,9 +36,33 @@
                 </div>
             </div>
         </div>
+        <div class="row" align="center"><br></div>
+        <div class="row" align="center">
+            <div class="col-xl-6">
+                <div id="my_camera"></div>
+                <form method="post" id="form">
+                    {% csrf_token %}
+                    <input type="text" class="form-control" id="image" name="url" aria-describedby="emailHelp"
+                        style="display: none;">
+                    <button type="submit" id="submitt" style="display: none;"></button>
+                </form>
+            </div>
+            <div class="col-xl-6">
+                <div class="row" align="center">
+                    <div class="col-6 col-xl-6">
+                        <h1 style="color: rgb(0, 218, 0);">Present</h1>
+                        <div id="left"></div>
+                    </div>
+                    <div class="col-6 col-xl-6">
+                        <h1 style="color: red;">Absent</h1>
+                        <div id="right"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <br>
-    <div class="container">
+    <!-- <div class="container">
         <div class="row" align="center">
             <div class="col-6 col-xl-6">
                 <h1 style="color: rgb(0, 218, 0);">Present</h1>
@@ -61,7 +73,7 @@
                 <div id="right"></div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div id="results"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
@@ -159,8 +171,39 @@
             }
 
             if (msg.message === 'ALL ARE PRESENT TODAY!! YOU MAY STOP THIS PORTAL') {
-                console.log("completed")
+                console.log(msg.lsta)
                 document.getElementById('list').innerHTML = msg.message
+                var string1 = "", string2 = "";
+                var lsta = msg.lsta;
+                var lstp = msg.lstp;
+
+                for (user in lstp) {
+
+                    string1 +=
+                        `<div class="card shadow" style="margin:10px;">
+                            <div class="card-body">
+                            <span style="font-size: larger;">date - ${date} ${time}</span>
+                            <span style="margin-left: 20px;"> 
+                            <span> Name - ${lstp[user]} </span>
+                            </span>
+                            </div>
+                            </div>`;
+                }
+                for (user in lsta) {
+                    string2 +=
+                        `<div class="card shadow" style="margin:10px;">
+                            <div class="card-body">
+                            <span style="font-size: larger;">date - ${date} ${time}</span>
+                            <span style="margin-left: 20px;"> 
+                            <span> Name - ${lsta[user]} </span>
+                            </span>
+                            </div>
+                            </div>`;
+                }
+                console.log(string1)
+                console.log(string2)
+                document.getElementById('left').innerHTML = string1;
+                document.getElementById('right').innerHTML = string2;
                 setInterval(
                     () => { window.open("/orgdashboard/", "_top") }
                     , 50000);
