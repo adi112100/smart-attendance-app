@@ -111,6 +111,29 @@ def viewall(request):
         return redirect('orglogin/')
 
 
+def check(request):
+    if request.is_ajax():
+        date = request.POST['datee']
+        users = Userattendance.objects.filter(orgname = request.user.username).filter(date = date)
+        if len(users)==0:
+             return JsonResponse({'message': 'Nothing to display!!'})
+        else:
+            lstp=[]
+            lsta=[]
+            for user in users:
+                if user.status:
+                    lstp.append(user.username)
+                else:
+                    lsta.append(user.username)
+            return JsonResponse({'message': 'success', 'username':'None', 'lstp': lstp, 'lsta': lsta})
+
+
+
+
+    users = Userattendance.objects.filter(orgname = request.user.username).filter(date = datetime.now().date())
+    return render(request, 'checkattendance.html', {'users':users})
+
+
 def attendance(request):
     if request.is_ajax():
         url = request.POST['url']

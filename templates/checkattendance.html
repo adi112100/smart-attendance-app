@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row" align="center">
+            <div class="col-xl-6 col-6">
+                <h3>Pick a date</h3>
+            </div>
+        </div>
+        <form id="form" class="form-group row" method="post">
+            {% csrf_token %}
+            <div class="col-6 col-xl-6">
+                <input class="form-control input-xl shadow" name="datee" type="date" value="2020-01-01"
+                    id="example-date-input">
+                <button type="submit" id="submitt" class="btn btn-dark" style="margin: 10px;">Check</button>
+            </div>
+        </form>
+    </div>
+    <div class="container-fluid">
+        <div class="row" align="center">
+            <div class="col-6 col-xl-6" id="infoo"></div>
+            <div class="col-6 col-xl-6">
+                <h1>Today</h1>
+                {% for user in users %}
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-body">
+
+                                <span style="font-size: 2vmin; margin-left: 30px;">username - {{user.username}}</span>
+                                <span style="font-size: 2vmin; margin-left: 30px;">date - {{user.date.date}}</span>
+                                <br>
+                                <span style="margin-left: 30px;"> status-
+                                    {% if user.status is True %}
+                                    <span style="color: rgb(0, 192, 0); font-size: x-large;"> Present</span>
+                                    {% else %}
+                                    <span style="color: rgb(235, 0, 0); font-size: x-large;">Absent</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js"
+        integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+
+    <script>
+
+        const form = document.getElementById('form');
+        form.addEventListener("submit", submitHandler);
+
+
+        function submitHandler(e) {
+            console.log("exec")
+            e.preventDefault();
+            $.ajax({
+                type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                url: '{% url "checkattendance" %}', // the url where we want to POST
+                data: $('#form').serialize(), // our form data
+                dataType: 'json', // what type of data do we expect back from the server
+                success: successFunction
+            });
+        }
+        function successFunction(msg) {
+            
+            if (msg.message === 'success') {
+                var string1 = "", string2 = "";
+                var lsta = msg.lsta;
+                var lstp = msg.lstp;
+
+                for (user in lstp) {
+
+                    string1 +=
+                        `<div class="card shadow" style="margin:10px;">
+                            <div class="card-body">
+                            <span style="color: rgb(0, 192, 0); font-size: x-large;"> Present</span>
+                            <span style="margin-left: 20px;"> 
+                            <span> Name - ${lstp[user]} </span>
+                            </span>
+                            </div>
+                            </div>`;
+                }
+                for (user in lsta) {
+                    string2 +=
+                        `<div class="card shadow" style="margin:10px;">
+                            <div class="card-body">
+                            <span style="color: rgb(235, 0, 0); font-size: x-large;">Absent</span>
+                            <span style="margin-left: 20px;"> 
+                            <span> Name - ${lsta[user]} </span>
+                            </span>
+                            </div>
+                            </div>`;
+                }
+                string1 +=string2;
+                document.getElementById('infoo').innerHTML = string1;
+
+                form.reset()
+
+            }
+            else {
+                document.getElementById("infoo").innerHTML = `<h1 style="color:red;">${msg.message}</h1> `
+            }
+        }
+    </script>
+</body>
+
+</html>

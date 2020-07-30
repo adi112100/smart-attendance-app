@@ -30,6 +30,7 @@ urlpatterns = [
     path('userdashboard/', views.userdashboard, name="userdashboard"),
     path('orgdashboard/viewall/', views.viewall, name="viewall"),
     path('orgdashboard/attendance/', views.attendance, name="attendance"),
+    path('orgdashboard/check/', views.check, name="checkattendance"),
     
     
 ]
