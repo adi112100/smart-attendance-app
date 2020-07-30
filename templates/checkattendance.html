@@ -29,21 +29,21 @@
         <div class="row" align="center">
             <div class="col-6 col-xl-6" id="infoo"></div>
             <div class="col-6 col-xl-6">
-                <h1>Today</h1>
+                <h4>Today</h4>
                 {% for user in users %}
-                <div class="row">
+                <div class="row" style="margin-bottom: 10px;">
                     <div class="col-xl-12">
                         <div class="card">
                             <div class="card-body">
 
-                                <span style="font-size: 2vmin; margin-left: 30px;">username - {{user.username}}</span>
-                                <span style="font-size: 2vmin; margin-left: 30px;">date - {{user.date.date}}</span>
-                                <br>
-                                <span style="margin-left: 30px;"> status-
+                                <span style="font-size: 2vmin;">username - {{user.username}}</span>
+                                <span style="font-size: 2vmin;">date - {{user.date.date}}</span>
+                                
+                                <span style=" font-size: 2vmin;"> status-
                                     {% if user.status is True %}
-                                    <span style="color: rgb(0, 192, 0); font-size: x-large;"> Present</span>
+                                    <span style="color: rgb(0, 192, 0); font-size: 2vmin;"> Present</span>
                                     {% else %}
-                                    <span style="color: rgb(235, 0, 0); font-size: x-large;">Absent</span>
+                                    <span style="color: rgb(235, 0, 0); font-size: 2vmin;">Absent</span>
                                     {% endif %}
                                 </span>
                             </div>
@@ -96,9 +96,9 @@
                     string1 +=
                         `<div class="card shadow" style="margin:10px;">
                             <div class="card-body">
-                            <span style="color: rgb(0, 192, 0); font-size: x-large;"> Present</span>
-                            <span style="margin-left: 20px;"> 
-                            <span> Name - ${lstp[user]} </span>
+                            <span style="color: rgb(0, 192, 0); font-size: 2vmin;"> Present</span>
+                            <span> 
+                            <span style="font-size: 2vmin;"> Name - ${lstp[user]} </span>
                             </span>
                             </div>
                             </div>`;
@@ -107,9 +107,9 @@
                     string2 +=
                         `<div class="card shadow" style="margin:10px;">
                             <div class="card-body">
-                            <span style="color: rgb(235, 0, 0); font-size: x-large;">Absent</span>
-                            <span style="margin-left: 20px;"> 
-                            <span> Name - ${lsta[user]} </span>
+                            <span style="color: rgb(235, 0, 0); font-size: 2vmin;">Absent</span>
+                            <span> 
+                            <span style="font-size: 2vmin;"> Name - ${lsta[user]} </span>
                             </span>
                             </div>
                             </div>`;
