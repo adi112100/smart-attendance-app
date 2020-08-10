@@ -171,20 +171,26 @@ def attendance(request):
             
             return JsonResponse({'message': 'ALL ARE PRESENT TODAY!! YOU MAY STOP THIS PORTAL', 'lstp': lstp, 'lsta': lsta})
 
-        username = []
+        username = None
+        userinfo = None
+        minvalue = 1
+        users = Userattendance.objects.filter(orgname=request.user.username).filter(date = datetime.now().date())
         for user in users:
             encoded = json.loads( user.encoded )
             encoded = np.array(encoded)
 
-            results = face_recognition.compare_faces([encoded], encodeimage)
-            if results:
-                username.append(user.username)
-                user.status = True
-                user.save()
-                break
+            results = face_recognition.face_distance([encoded], encodeimage)
+            if results[0] < minvalue:
+                minvalue = results[0]
+                username = user.username
+                userinfo = user
+
+        userinfo.status = True
+        userinfo.save()
                 
-        if len(username) == 0:
-            username.append('None')
+                
+        # if len(username) == 0:
+        #     username.append('None')
         users = Userattendance.objects.filter(orgname=request.user.username).filter(date = datetime.now().date())
         lstp=[]
         lsta=[]
