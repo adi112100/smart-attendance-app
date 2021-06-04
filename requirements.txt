@@ -2,7 +2,7 @@
 click==7.1.2
 cmake==3.18.0
 dj-database-url==0.5.0
-Django==3.0.14
+Django==3.1.9
 django-crispy-forms==1.9.2
 django-heroku==0.3.1
 dlib==19.20.0
